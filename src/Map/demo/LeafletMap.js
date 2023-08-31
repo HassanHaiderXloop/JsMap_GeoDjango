@@ -1,4 +1,4 @@
-import React, { useEffect, useRef ,useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./LeafletMap.css";
@@ -166,10 +166,17 @@ const LeafletMap = () => {
     });
     map.addControl(drawControl);
     //Envent Handler
-    map.on("draw:created", function (e) {
-      var type = e.layerType,
-        layer = e.layer;
+    map.on('draw:created', function (event) {
+      var layer = event.layer;
       drawnItems.addLayer(layer);
+
+      if (layer instanceof L.Polygon) {
+        var area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+        var popup = L.popup()
+          .setLatLng(layer.getBounds().getCenter())
+          .setContent('Area: ' + area.toFixed(2) + ' sqm')
+          .openOn(map);
+      }
     });
 
     /////////////////////
@@ -191,11 +198,7 @@ const LeafletMap = () => {
     sideBySideControlRef.current = L.control.sideBySide(stadiaDark, dark);
 
     return () => {
-      map.off("draw:created", function (e) {
-        var type = e.layerType,
-          layer = e.layer;
-        drawnItems.addLayer(layer);
-      });
+      map.off("draw:created");
     };
   }, []);
 
@@ -209,14 +212,14 @@ const LeafletMap = () => {
     }
   };
 
- 
+
   return (
     <>
       <div id="map" ref={mapRef} className="leaflet-map"></div>
       <button onClick={toggleSideBySide}>
-      {sideBySideActive ? "Exit sideBySide" : "Enter sideBySide"}
-    </button>
-   
+        {sideBySideActive ? "Exit sideBySide" : "Enter sideBySide"}
+      </button>
+
     </>
   );
 };
