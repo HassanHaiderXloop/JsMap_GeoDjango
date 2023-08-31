@@ -1,20 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef ,useState } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./LeafletMap.css";
-import 'leaflet-measure';
+import "leaflet-measure";
 import "leaflet-measure/dist/leaflet-measure.css";
 import data from "./../shapesData.js";
 import "leaflet-side-by-side";
-import 'leaflet-draw';
-import 'leaflet-draw/dist/leaflet.draw.css';
-
+import "leaflet-draw";
+import "leaflet-draw/dist/leaflet.draw.css";
 
 const SIX_MONTHS_IN_MILLISECONDS = 6 * 30 * 24 * 60 * 60 * 1000;
 
 const LeafletMap = () => {
   const mapRef = useRef(null);
   const geoMap = useRef(null);
+
+  const [sideBySideActive, setSideBySideActive] = useState(false);
+  const sideBySideControlRef = useRef(null);
 
   const stadiaDark = L.tileLayer(
     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -35,7 +37,7 @@ const LeafletMap = () => {
   );
   useEffect(() => {
     geoMap.current = L.map(mapRef.current).setView([24.8083, 67.0225], 16);
-    const map = geoMap.current
+    const map = geoMap.current;
 
     //////////////////////
     // Intitlizing Maps //
@@ -114,12 +116,11 @@ const LeafletMap = () => {
       }
     });
 
-
     ///////////////////
     // Layer Control //
     ///////////////////
     var baseMaps = {
-      "Dark": dark,
+      Dark: dark,
       "Water color map": watercolor,
       // "Google geo": stadiaDark,
       "Google Street": googleStreets,
@@ -131,47 +132,45 @@ const LeafletMap = () => {
     // FeatureGroup Draw //
     ///////////////////////
     var drawnItems = new L.FeatureGroup();
-     map.addLayer(drawnItems);
-     var drawControl = new L.Control.Draw({
-     	position: 'topright',
-		     	draw: {
-		    polygon: {
-		     shapeOptions: {
-		      color: 'purple',
-          weight:2,
-          opacity: 0.3,
-          fillColor:'lightred'
-		     },
-		     allowIntersection: false,
-		     drawError: {
-		      color: 'orange',
-          weight:1,
-		      timeout: 1000
-		     },
-		    },
-		    polyline: {
-		     shapeOptions: {
-		      color: 'red',
-          weight:2,
-          
-		     },
-		    },
-        text : true ,
-		   circle: false,
-       weight:1,
-		   },
-         edit: {
-             featureGroup: drawnItems
-         }
-     });
-     map.addControl(drawControl);
-     //Envent Handler
-      map.on('draw:created', function (e) {
-            var type = e.layerType,
-                layer = e.layer;
-          drawnItems.addLayer(layer);
-            
-        });
+    map.addLayer(drawnItems);
+    var drawControl = new L.Control.Draw({
+      position: "topright",
+      draw: {
+        polygon: {
+          shapeOptions: {
+            color: "purple",
+            weight: 2,
+            opacity: 0.3,
+            fillColor: "lightred",
+          },
+          allowIntersection: false,
+          drawError: {
+            color: "orange",
+            weight: 1,
+            timeout: 1000,
+          },
+        },
+        polyline: {
+          shapeOptions: {
+            color: "red",
+            weight: 2,
+          },
+        },
+        text: true,
+        circle: false,
+        weight: 1,
+      },
+      edit: {
+        featureGroup: drawnItems,
+      },
+    });
+    map.addControl(drawControl);
+    //Envent Handler
+    map.on("draw:created", function (e) {
+      var type = e.layerType,
+        layer = e.layer;
+      drawnItems.addLayer(layer);
+    });
 
     /////////////////////
     // Leaflet measure //
@@ -189,23 +188,35 @@ const LeafletMap = () => {
     /////////////////////
     L.control.scale({ position: "bottomleft" }).addTo(map);
 
+    sideBySideControlRef.current = L.control.sideBySide(stadiaDark, dark);
+
     return () => {
-      map.off('draw:created', function (e) {
+      map.off("draw:created", function (e) {
         var type = e.layerType,
           layer = e.layer;
-          drawnItems.addLayer(layer);
+        drawnItems.addLayer(layer);
       });
     };
-  }, [mapRef.current]);
+  }, []);
 
+  const toggleSideBySide = () => {
+    if (sideBySideActive) {
+      geoMap.current.removeControl(sideBySideControlRef.current);
+      setSideBySideActive(false);
+    } else {
+      sideBySideControlRef.current.addTo(geoMap.current);
+      setSideBySideActive(true);
+    }
+  };
 
+ 
   return (
     <>
       <div id="map" ref={mapRef} className="leaflet-map"></div>
-      <button onClick={() => {
-        L.control.sideBySide(stadiaDark, dark).addTo(geoMap.current);
-      }}>sideBySide_Map</button>
-
+      <button onClick={toggleSideBySide}>
+      {sideBySideActive ? "Exit sideBySide" : "Enter sideBySide"}
+    </button>
+   
     </>
   );
 };
