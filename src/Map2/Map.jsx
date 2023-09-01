@@ -138,9 +138,9 @@ const Map = () => {
 },[]);
 
 
- const printMap = () => {
-     window.print();
- };
+//  const printMap = () => {
+//      window.print();
+//  };
 
   return (
     <div>
