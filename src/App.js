@@ -1,13 +1,11 @@
-import React from "react";
-
 import LeafletMap from "./Map/demo/LeafletMap.js";
-// import LeafletMap from "./Map/Leaflet.js";
+import Map from "./Map2/Map.jsx";
 
 function App() {
   return (
-    <div>
-      <LeafletMap />
-    </div>
+    <>
+      <Map/>
+    </>
   );
 }
 
