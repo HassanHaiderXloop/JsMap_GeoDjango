@@ -7,7 +7,6 @@ import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet-measure";
 import "leaflet/dist/leaflet.css";
 import { MapSingleton } from "./MapSingleton";
-import Leaf from "leaflet";
 
 const MapWrapper = ({
   initial,

@@ -1,10 +1,9 @@
 import React, { useCallback, useRef } from "react";
 import MapWrapper from "./Component/MapWrapper";
-import { geoJson, tileLayer } from "leaflet";
+// import { geoJson, tileLayer } from "leaflet";
 import data from "./Component/shapesData";
 import { MapSingleton } from "./Component/MapSingleton";
 
-/*** Waqar refacting */
 const SIX_MONTHS_IN_MILLISECONDS = 6 * 30 * 24 * 60 * 60 * 1000;
 
 const Map = () => {
